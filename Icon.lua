@@ -66,13 +66,14 @@ local function newAligned(alignment: Enum.HorizontalAlignment)
 		iconContainer.AnchorPoint = Vector2.new(0.5, 0)
 		iconContainer.Position = UDim2.new(0.5, 0, 0, 0)
 	end
-	iconContainer.Size = UDim2.new(0.5, -16, 0, 36)
+	iconContainer.Size = UDim2.new(1/3, -16, 0, 36)
 	iconContainer.Active = false
 
 	local layout = Instance.new("UIListLayout")
 	layout.FillDirection = Enum.FillDirection.Horizontal
 	layout.HorizontalAlignment = alignment
 	layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
 	layout.Padding = UDim.new(0, 12)
 
 	layout.Parent = iconContainer
@@ -111,15 +112,17 @@ end)
 
 topbarGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 
-function Icon.new()
+local size = UDim2.fromOffset(32, 32)
+function Icon.new()	
 	local image = Instance.new("ImageButton")
 	image.Name = "Icon"
 	image.Visible = true
 	image.ZIndex = 69
 	image.BorderSizePixel = 0
-	image.AutoButtonColor = false
+	image.AutoButtonColor = true
 	image.Active = true
-	image.Size = UDim2.fromOffset(32, 32)
+	image.Size = size
+	image.AutomaticSize = Enum.AutomaticSize.X
 	image.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	image.BackgroundTransparency = 0.5
 	image.Transparency = 0.5
@@ -128,8 +131,13 @@ function Icon.new()
 
 	local label = Instance.new("TextLabel")
 	label.Text = ""
+	label.Font = Enum.Font.Gotham
+	label.TextScaled = true
+	label.ZIndex = 70
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
 	label.BackgroundTransparency = 1
-	label.Size = UDim2.fromScale(0.7, 0.7)
+	label.Size = UDim2.fromScale(1, 1)
+	label.AutomaticSize = Enum.AutomaticSize.X
 	label.Position = UDim2.fromScale(0.5, 0.5)
 	label.AnchorPoint = Vector2.new(0.5, 0.5)
 	label.Active = false
@@ -142,6 +150,7 @@ function Icon.new()
 	local self = setmetatable({
 		image = image,
 		textLabel = label,
+		size = size,
 
 		keybinds = keybinds,
 
@@ -176,6 +185,13 @@ function Icon:BindToggleItem(gui: GuiBase)
 	self.Deselected:Connect(function()
 		gui[property] = false
 	end)
+end
+
+function Icon:SetSize(size: UDim2)
+	self.image.Size = size
+	self.image.AutomaticSize = Enum.AutomaticSize.None
+
+	self.textLabel.AutomaticSize = Enum.AutomaticSize.None
 end
 
 function Icon:Deselect()
@@ -223,6 +239,13 @@ end
 
 function Icon:UnbindToggleKey(key: Enum.KeyCode)
 	self.keybinds[key] = nil
+end
+
+function Icon:Destroy()
+	self.image:Destroy()
+	self.textLabel:Destroy()
+	table.clear(self)
+	setmetatable(self, nil)
 end
 
 return Icon
