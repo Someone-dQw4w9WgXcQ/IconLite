@@ -187,6 +187,11 @@ function Icon:BindToggleItem(gui: GuiBase)
 	end)
 end
 
+function Icon:SetIconVisibility(visible: boolean)
+	self.image.Visible = visible
+	self.textLabel.Visible = visible
+end
+
 function Icon:SetSize(size: UDim2)
 	self.image.Size = size
 	self.image.AutomaticSize = Enum.AutomaticSize.None
